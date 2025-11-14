@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Simple seeding script for Supabase using the REST API
 // Usage:
-//  SUPABASE_URL="https://...supabase.co" SUPABASE_ANON_KEY="anon..." node deployment/scripts/seed_supabase.js
+//  SUPABASE_URL="https://...supabase.co" SUPABASE_ANON_KEY="anon..." node supabase/scripts/seed_supabase.js
 // If you have dotenv installed, it will auto-load a .env file.
 
 (async () => {
@@ -44,7 +44,7 @@
     };
 
     async function post(table, rows) {
-      const url = `${SUPABASE_URL.replace(/\/+$/, '')}/rest/v1/${table}`;
+      const url = `${SUPABASE_URL.replace(/\/+$|\/+$/,'')}/rest/v1/${table}`;
       const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(rows) });
       const text = await resp.text();
       let body;
@@ -94,7 +94,7 @@
 
     // Insert in order (profiles -> jobs -> others)
     await post('profiles', profiles);
-    await post('jobs', jobs);
+    await post('jobs', allJobs);
     await post('applications', applications);
     await post('saved_jobs', saved_jobs);
     await post('notifications', notifications);
