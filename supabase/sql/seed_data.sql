@@ -101,3 +101,34 @@ on conflict (id) do nothing;
 -- Helpful indexes
 create index if not exists idx_jobs_created_at on jobs (created_at);
 create index if not exists idx_profiles_username on profiles (username);
+
+-- Add more default profiles (bring total to ~10)
+insert into profiles (username, full_name, avatar_url, bio)
+values
+  ('david', 'David Dawson', null, 'Frontend engineer - React/Next.js'),
+  ('emma', 'Emma Evans', null, 'Software engineer - Python/ML'),
+  ('frank', 'Frank Foster', null, 'Backend engineer - Go/Postgres'),
+  ('gina', 'Gina Green', null, 'QA Engineer - Automation'),
+  ('harry', 'Harry Hall', null, 'DevOps engineer - Kubernetes'),
+  ('irene', 'Irene Ivy', null, 'Mobile engineer - Flutter'),
+  ('jack', 'Jack Jones', null, 'Full-stack engineer - Node & React')
+on conflict (username) do nothing;
+
+-- Insert additional software-related jobs so there are ~10 sample jobs
+insert into jobs (title, company, location, description, salary, created_by)
+values
+  ('Software Engineer', 'SoftWorks', 'Remote', 'Develop scalable backend services in Node.js', '$90k-130k', NULL),
+  ('Backend Software Engineer', 'InfraCloud', 'Remote', 'Work on APIs and microservices (Go/Node)', '$100k-140k', NULL),
+  ('Frontend Software Engineer', 'PixelStudio', 'Remote', 'React, TypeScript and UI performance', '$85k-125k', NULL),
+  ('Machine Learning Engineer', 'DataMinds', 'Remote', 'Build ML models and pipelines in Python', '$120k-160k', NULL),
+  ('Site Reliability Engineer', 'CloudOps', 'Remote', 'Reliability, observability, and SRE practices', '$110k-150k', NULL)
+on conflict (id) do nothing;
+
+-- Create 2 default notifications per profile (welcome + job alert)
+WITH p AS (SELECT id FROM profiles)
+INSERT INTO notifications (id, user_id, type, message, read)
+SELECT gen_random_uuid(), p.id, v.type, v.msg, false
+FROM p CROSS JOIN (VALUES
+  ('system','Welcome to Job_App!'),
+  ('alert','New jobs matching your profile were posted')) AS v(type, msg)
+ON CONFLICT (id) DO NOTHING;

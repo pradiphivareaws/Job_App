@@ -6,7 +6,10 @@
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Minimal: allow anon to SELECT any row
-CREATE POLICY IF NOT EXISTS "Allow anon to select profiles"
+-- Drop existing policy first because some Postgres versions (used by Supabase) do
+-- not support `CREATE POLICY IF NOT EXISTS`.
+DROP POLICY IF EXISTS "Allow anon to select profiles" ON public.profiles;
+CREATE POLICY "Allow anon to select profiles"
   ON public.profiles
   FOR SELECT
   USING (true);
