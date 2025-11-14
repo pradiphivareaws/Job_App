@@ -40,6 +40,13 @@ app.use('/api/saved-jobs', savedJobRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// Mount development helper routes when explicitly enabled
+if (process.env.DEV_ALLOW_DEV_ROUTES === 'true') {
+  const devRoutes = (await import('./routes/dev.js')).default;
+  app.use('/api/dev', devRoutes);
+  console.log('Dev routes enabled at /api/dev');
+}
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
