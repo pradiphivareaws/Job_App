@@ -4,6 +4,13 @@
 -- Ensure pgcrypto for gen_random_uuid()
 create extension if not exists "pgcrypto";
 
+-- Safety: if this project already has a `profiles` table with different schema,
+-- ensure the columns we rely on exist before inserting. These `ALTER TABLE`
+-- statements use `IF NOT EXISTS` so they are safe to run repeatedly.
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS username text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS bio text;
+
 -- Profiles
 create table if not exists profiles (
   id uuid primary key default gen_random_uuid(),
