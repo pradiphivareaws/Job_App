@@ -1,4 +1,4 @@
-import '../../observability/trace/backend-otel.js';
+import './backend-otel.js';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
