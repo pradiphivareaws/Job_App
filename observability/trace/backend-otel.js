@@ -5,7 +5,8 @@ const { NodeSDK } = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
-const jaegerEndpoint = process.env.JAEGER_ENDPOINT || 'http://localhost:14268/api/traces';
+// When running monitoring in Docker Compose alongside the backend, use the `jaeger` service name.
+const jaegerEndpoint = process.env.JAEGER_ENDPOINT || 'http://jaeger:14268/api/traces';
 
 const jaegerExporter = new JaegerExporter({ endpoint: jaegerEndpoint });
 

@@ -8,7 +8,7 @@ scrape_configs:
       - targets: ['localhost:9090']
 
   - job_name: 'job_app'
-    # For local Docker on Windows, use host.docker.internal to reach host services
+    # Try both the backend container (when running compose together) and host.docker.internal
     static_configs:
-      - targets: ['host.docker.internal:3001']
+      - targets: ['backend:3001', 'host.docker.internal:3001']
     metrics_path: /metrics
