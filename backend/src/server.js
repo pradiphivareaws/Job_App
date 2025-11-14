@@ -1,3 +1,4 @@
+import '../../observability/trace/backend-otel.js';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -44,6 +45,21 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Try to enable prom-client metrics endpoint if the package is available
+(async () => {
+  try {
+    const promClient = await import('prom-client');
+    promClient.collectDefaultMetrics();
+    app.get('/metrics', async (req, res) => {
+      res.set('Content-Type', promClient.register.contentType);
+      res.end(await promClient.register.metrics());
+    });
+    console.log('Prometheus metrics endpoint enabled at /metrics');
+  } catch (e) {
+    console.log('prom-client not installed; /metrics endpoint disabled');
+  }
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+})();

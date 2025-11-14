@@ -1,9 +1,9 @@
 // OpenTelemetry bootstrap for Job_App backend
 // Install in backend: npm i @opentelemetry/sdk-node @opentelemetry/auto-instrumentations-node @opentelemetry/exporter-jaeger prom-client
 
-const { NodeSDK } = require('@opentelemetry/sdk-node');
-const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+import { NodeSDK } from '@opentelemetry/sdk-node';
+import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 // When running monitoring in Docker Compose alongside the backend, use the `jaeger` service name.
 const jaegerEndpoint = process.env.JAEGER_ENDPOINT || 'http://jaeger:14268/api/traces';
@@ -15,15 +15,11 @@ const sdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()]
 });
 
-sdk.start()
-  .then(() => console.log('OTel SDK started (traces ->', jaegerEndpoint, ')'))
-  .catch((err) => console.error('Error starting OTel SDK', err));
-
-// Prometheus metrics helper (optional)
 try {
-  const client = require('prom-client');
-  client.collectDefaultMetrics();
-  console.log('prom-client default metrics enabled');
-} catch (e) {
-  // prom-client not installed
+  await sdk.start();
+  console.log('OTel SDK started (traces ->', jaegerEndpoint, ')');
+} catch (err) {
+  console.error('Error starting OTel SDK', err);
 }
+
+// Note: prom-client metrics are enabled from the backend app itself (optional). This file focuses on tracing.
